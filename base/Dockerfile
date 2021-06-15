@@ -12,13 +12,21 @@ LABEL org.opencontainers.image.documentation="https://github.com/agschrei/produc
 LABEL org.opencontainers.image.source="https://github.com/agschrei/productivity-images.git"
 LABEL org.opencontainers.image.licenses="MIT"
 
-RUN apt update && apt upgrade -y && apt install zsh curl git htop build-essential ca-certificates dpkg-dev jq python3 python3-pip fonts-powerline -y --no-install-recommends
+RUN apt update && apt upgrade -y && apt install zsh curl git htop build-essential tmux vim ca-certificates dpkg-dev jq python3 python3-pip fonts-powerline -y --no-install-recommends
 
-# change default shell to zsh
-RUN chsh -s $(which zsh)
-RUN sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+ARG username=debug
+
+# add non-root user and set zsh as default shell
+RUN useradd -m ${username} -s $(which zsh)
+
+WORKDIR /home/${username}
+
+USER ${username}:0
+
+# install oh-my-zsh
+RUN ZSH=/home/${username}/.oh-my-zsh; sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 
 RUN git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
-COPY *.zsh* ./
+COPY --chown=${username}:0 *.zsh* ./
 
 ENTRYPOINT [ "/bin/zsh" ]

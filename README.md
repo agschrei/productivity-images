@@ -13,3 +13,9 @@ This is the bare minimum I want to have in an interactive image, is based on ubu
 - build-essential (including gcc and make)
 
 To make installation of additional packages easier, the default user for this image is root.
+
+## K8s image
+This image adds on top of the minimal base image and provides the following:
+- kubectl
+- helm
+A kubeconfig file is expected to be mounted at k8s/config
